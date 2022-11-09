@@ -137,6 +137,15 @@ webserver or in a Google Keep note or something. This way, we always know how mu
 of each item we have and can make purchases accordingly.
 </details>
 
+<br>
+
+<details>
+<summary><b>Online Personal Life Dashboard</b></summary>
+I'd like to build an online dashboard to track things like weight, food, workouts,
+scripture study, journaling, Come Follow Me, Bassoon, Plasma money, financial goals,
+and other important life metrics.
+</details>
+
 ## Template Project
 
 <br>
