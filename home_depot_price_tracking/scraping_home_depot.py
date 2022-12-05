@@ -56,7 +56,7 @@ scope = ["https://spreadsheets.google.com/feeds",
 creds = ServiceAccountCredentials.from_json_keyfile_name(os.path.join(sys.path[0], "creds.json"),scope)
 client = gspread.authorize(creds)
 
-sheet = client.open("Costs of Wood Tracker").get_worksheet(1)
+sheet = client.open("Costs of Wood Tracker").worksheet('Data')
 log = client.open("Costs of Wood Tracker").get_worksheet(4)
 
 def convert_price(string_price):
