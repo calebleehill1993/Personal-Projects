@@ -8,12 +8,6 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
-# from selenium import webdriver
-# from selenium.webdriver.chrome.options import Options
-
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-from selenium import webdriver
 import geckodriver_autoinstaller
 # Used for scrapping websites from HTML
 from bs4 import BeautifulSoup
@@ -26,28 +20,6 @@ import time
 
 start = time.time()
 
-geckodriver_autoinstaller.install()
-
-options = webdriver.FirefoxOptions()
-options.add_argument('--headless')
-options.add_argument("start-maximized")
-options.add_argument("disable-infobars")
-options.add_argument("--disable-extensions")
-options.add_argument('--no-sandbox')
-options.add_argument('--disable-application-cache')
-options.add_argument('--disable-gpu')
-options.add_argument("--disable-dev-shm-usage")
-
-# geolocation supported, allowed and location mocked
-options.set_preference('geo.prompt.testing', True)
-options.set_preference('geo.prompt.testing.allow', True)
-options.set_preference('geo.provider.network.url','data:application/json,{"location": {"lat": 37.366210, "lng": -121.950256}, "accuracy": 100.0}')
-
-# profile = webdriver.FirefoxProfile()
-# # We set the coordinate of where we want to be.
-# profile.set_preference("geo.wifi.uri", 'data:application/json,{"location": {"lat": 38.912650, "lng":-77.036185}, "accuracy": 20.0}')
-# # This line is necessary to avoid to prompt for geolocation authorization.
-# profile.set_preference("geo.prompt.testing", True)
 
 # options = Options()
 # options.add_argument("--window-size=1920,1080")
@@ -110,43 +82,8 @@ for link in links:
             print('Failed. Starting try ' + str(tries))
             to_log('Failed. Starting try ' + str(tries))
         try:
-            count += 1
-            to_log('Starting Firefox Web Driver ' + str(count) + '/' + str(len(links)))
-            browser = webdriver.Firefox(options=options)
-
-            # to_log('Getting starter page')
-            # browser.get(
-            #     'https://www.homedepot.com/p/OSB-7-16-in-Sheathing-Panel-Application-as-4-ft-x-8-ft-386081/202106230')
-            # time.sleep(5)
-            # assert 'Home Depot' in browser.title
-            #
-            # to_log('Selecting Store')
-            #
-            # browser.find_element(By.XPATH, '//div[@class="MyStoreWrapper"]').click()
-            #
-            # time.sleep(2)
-            # browser.find_element(By.XPATH, "//span[text()='Find Other Stores']").click()
-            # time.sleep(2)
-            # elem = browser.find_element(By.ID, "myStore-formInput")
-            # elem.send_keys('83815')
-            # elem.send_keys(Keys.RETURN)
-            # time.sleep(2)
-            # try:
-            #     browser.find_element(By.XPATH, '//button[@data-storezip="83815"]').click()
-            #     time.sleep(5)
-            # except:
-            #     print("That's the already selected store.")
-            #     to_log("That's the already selected store.")
-
-            browser.get(link)
-            time.sleep(5 * tries)
-
-            print(browser.title)
 
             html_path = os.path.join(os.path.dirname(__file__), 'home_depot.html')
-
-            with open(html_path, "w") as f:
-                f.write(browser.page_source)
 
             with open(html_path, "r") as f:
                 soup = BeautifulSoup(f, 'html.parser')
