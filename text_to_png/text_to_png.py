@@ -22,17 +22,25 @@ class TestToPng:
         aspect_ratios_strings = ('7x9', '9x7')
         a_ratios = StringVar(value=aspect_ratios_strings)
         self.hidden = BooleanVar(value=False)
+        self.hidden_text_color = IntVar(value=5)
+        entry = Entry(mainframe, textvariable=self.hidden_text_color)
+        slider = Scale(mainframe, from_=0, to=255, orient='horizontal', variable=self.hidden_text_color)
         self.use_current_time = BooleanVar(value=True)
+        self.flip_image = BooleanVar(value=False)
 
         self.lbox = Listbox(mainframe, listvariable=a_ratios, height=5, width=5)
         check1 = Checkbutton(mainframe, text='Hidden', variable=self.hidden)
         check2 = Checkbutton(mainframe, text='Use Current Time', variable=self.use_current_time)
+        check3 = Checkbutton(mainframe, text='Flip Image', variable=self.flip_image)
         self.cal = Calendar(mainframe)
         self.clock = AnalogPicker(mainframe)
         self.textbox = Text(mainframe, wrap='word')
         self.lbox.grid(column=0, row=0)
         check1.grid(column=1, row=0)
-        check2.grid(column=2, row=0)
+        check2.grid(column=2, row=1)
+        check3.grid(column=3, row=1)
+        entry.grid(column=2, row=0)
+        slider.grid(column=3, row=0, columnspan=2)
         self.cal.grid(column=0, row=1)
         self.clock.grid(column=1, row=1)
         self.textbox.grid(column=0, row=2, columnspan=2)
@@ -63,6 +71,7 @@ class TestToPng:
 
     def clear_text(self):
         self.textbox.delete('1.0', END)
+
     def calculate(self, *args):
         date = self.cal.selection_get()
         hour, minute, period = self.clock.time()
@@ -82,7 +91,7 @@ class TestToPng:
 
         # calculations
         if hidden:
-            text_color = (5, 5, 5)
+            text_color = tuple([self.hidden_text_color.get()]*3)
         if use_current_time:
             dt = datetime.datetime.now()
         image_ratio = ratio[0] / ratio[1]
@@ -98,15 +107,19 @@ class TestToPng:
             filename = f'{dt.strftime("%Y.%m.%d_%H.%M.%S")}_{text}.png'
         # Sending to the desktop
         filepath = os.path.join(os.path.expanduser("~/Desktop"), filename)
+
         def get_wrapped_text(text: str, font: ImageFont.ImageFont,
                              line_length: int):
             lines = ['']
-            for word in text.split():
-                line = f'{lines[-1]} {word}'.strip()
-                if font.getlength(line) <= line_length:
-                    lines[-1] = line
-                else:
-                    lines.append(word)
+            paragraphs = text.split('\n')
+            for paragraph in paragraphs:
+                for word in paragraph.split(sep=' '):
+                    line = f'{lines[-1]} {word}'.strip()
+                    if font.getlength(line) <= line_length:
+                        lines[-1] = line
+                    else:
+                        lines.append(word)
+                lines.append('\n')
             return '\n'.join(lines)
 
         for text_size in range(font_size, 0, -1):
@@ -130,6 +143,10 @@ class TestToPng:
         image = Image.new('RGB', (image_width, image_height), color='black')
         draw = ImageDraw.Draw(image)
         draw.multiline_text(text_top_left, text_wrapped, font=font, align='center', spacing=spacing, fill=text_color)
+
+        if self.flip_image.get():
+            image = image.transpose(Image.ROTATE_180)
+
         image.save(filepath)
         set_created_command = 'SetFile -d "{}" "{}"'.format(dt.strftime('%m/%d/%Y %H:%M:%S'), filepath)
         set_modified_command = 'SetFile -m "{}" "{}"'.format(dt.strftime('%m/%d/%Y %H:%M:%S'), filepath)
