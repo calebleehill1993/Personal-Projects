@@ -118,19 +118,24 @@ class TestToPng:
                     if font.getlength(line) <= line_length:
                         lines[-1] = line
                     else:
-                        lines.append(word)
+                        if font.getlength(word) <= line_length:
+                            lines.append(word)
+                        else:
+                            return None
                 lines.append('\n')
-            return '\n'.join(lines)
+            return '\n'.join(lines[:-1])
 
         for text_size in range(font_size, 0, -1):
             font = ImageFont.truetype(font_url, text_size)
             wrapped = get_wrapped_text(text, font, text_width)
+            if wrapped is None:
+                continue
             image = Image.new('RGB', (image_width, image_height), color='black')
             draw = ImageDraw.Draw(image)
             left, top, right, bottom = draw.multiline_textbbox(center, wrapped, font=font, align='center',
                                                                spacing=spacing)
             instance_text_height = bottom - top
-            if instance_text_height < text_height:
+            if instance_text_height <= text_height:
                 text_wrapped = wrapped
                 instance_text_width = right - left
                 break
